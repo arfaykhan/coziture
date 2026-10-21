@@ -1,4 +1,5 @@
-import {loadEnvConfig} from '@next/env';
+import nextEnv from '@next/env';
+const {loadEnvConfig} = nextEnv;
 import pg from 'pg';
 import bcrypt from 'bcryptjs';
 import {readFile} from 'node:fs/promises';
