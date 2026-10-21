@@ -1,0 +1,5 @@
+'use client';
+import {useState} from 'react';
+import {useStore} from './StoreProvider';
+import {money} from '@/lib/utils';
+export default function ProductDetail({product:p,currency}) {const [quantity,setQuantity]=useState(1);const {add,save,saved,ready}=useStore();return <div className="detail"><img src={p.image} alt={p.name}/><div><p className="eyebrow">{p.category}</p><h1>{p.name}</h1><p className="price">{money(p.price_cents,currency)}</p><p>{p.description}</p><p className="muted">{p.stock?`${p.stock} available`:'Currently sold out'}</p><label>Quantity<input type="number" min="1" max={Math.min(99,p.stock)} value={quantity} onChange={e=>setQuantity(Number(e.target.value))}/></label><div className="actions"><button disabled={!ready||!Number.isInteger(quantity)||quantity<1||quantity>Math.min(99,p.stock)} onClick={()=>add(p,quantity)}>Add to bag</button><button className="outline" disabled={!ready} onClick={()=>save(p.id)}>{saved.includes(p.id)?'♥ Saved':'♡ Save for later'}</button></div></div></div>;}

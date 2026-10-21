@@ -1,0 +1,14 @@
+'use client';
+import {useEffect,useState} from 'react';
+import Link from 'next/link';
+import {useStore} from './StoreProvider';
+import {api} from '@/lib/client';
+import {money} from '@/lib/utils';
+export default function Checkout({user,payments}) {
+ const {cart,setCart,ready}=useStore(),[quote,setQuote]=useState(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[method,setMethod]=useState(payments[0]?.code||''),[key,setKey]=useState('');
+ useEffect(()=>{let k=sessionStorage.getItem('coziture-checkout');if(!k){k=crypto.randomUUID();sessionStorage.setItem('coziture-checkout',k);}setKey(k);},[]);
+ useEffect(()=>{let cancelled=false;setQuote(null);if(ready&&cart.length)api('/api/cart',cart).then(q=>{if(!cancelled){setQuote(q);setError('');}}).catch(e=>{if(!cancelled)setError(e.message);});return()=>{cancelled=true;};},[cart,ready]);
+ async function submit(e){e.preventDefault();setBusy(true);setError('');try{const result=await api('/api/orders',{...Object.fromEntries(new FormData(e.currentTarget)),items:cart,checkout_key:key});setCart([]);sessionStorage.removeItem('coziture-checkout');location.assign(`/order/${result.id}`);}catch(e){setError(e.message);setBusy(false);}}
+ if(!ready)return <p>Loading checkout…</p>;if(!cart.length)return <p>Your bag is empty. <Link href="/shop">Explore the collection →</Link></p>;
+ return <form className="checkout-grid" onSubmit={submit}><div className="panel"><h2>Delivery details</h2>{Object.entries({name:'Full name',email:'Email',address:'Street address',city:'City',postal:'Postal code',country:'Country'}).map(([key,label])=><label key={key}>{label}<input name={key} type={key==='email'?'email':'text'} required maxLength={{name:80,email:190,address:500,city:100,postal:30,country:80}[key]} defaultValue={user[key]||''}/></label>)}<h2>How would you like to pay?</h2>{payments.map(p=><label className="payment" key={p.id}><input type="radio" name="payment_method" value={p.code} checked={method===p.code} onChange={()=>setMethod(p.code)}/><span><strong>{p.name}</strong><small>{p.instructions}</small></span></label>)}<label>Payment reference (optional)<input name="payment_reference" maxLength="120"/></label><p className="muted">Transfer payments are verified manually by the store.</p></div><aside className="panel"><h2>Order summary</h2>{quote?.items.map(p=><p className="row" key={p.id}><span>{p.name} × {p.quantity}</span><strong>{money(p.price_cents*p.quantity,quote.currency)}</strong></p>)}{quote&&<><p className="row"><span>Shipping</span><strong>{money(quote.shipping,quote.currency)}</strong></p><h3 className="row"><span>Total</span><span>{money(quote.subtotal+quote.shipping,quote.currency)}</span></h3></>}{error&&<p className="error" role="alert">{error}</p>}<button disabled={busy||!quote||!key||!method}>{busy?'Placing order…':'Place order'}</button><Link href="/cart">Edit your bag</Link></aside></form>;
+}

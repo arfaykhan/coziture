@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function Footer({settings}) {return <footer><div><Link className="brand" href="/">{settings.brand} ✳</Link><p>{settings.footer_text}</p></div><nav aria-label="Footer"><Link href="/about">About</Link><Link href="/contact">Contact</Link><Link href="/shipping">Shipping & returns</Link><Link href="/privacy">Privacy</Link></nav><small>© {new Date().getFullYear()} {settings.brand}</small></footer>;}

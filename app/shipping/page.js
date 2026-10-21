@@ -1,0 +1,3 @@
+import {settings} from '@/lib/catalog';
+import {money} from '@/lib/utils';
+export default async function Page(){const s=await settings();return <section className="section prose"><h1>Shipping & returns</h1><p>{s.shipping_text}</p><h2>Shipping costs</h2><p>Standard shipping: {money(s.shipping_cents,s.currency)}. Free shipping from {money(s.free_shipping_cents,s.currency)}.</p><h2>Returns</h2><p>{s.returns_text}</p></section>;}

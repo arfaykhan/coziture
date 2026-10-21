@@ -1,0 +1,3 @@
+import {settings} from '@/lib/catalog';
+import {money} from '@/lib/utils';
+export default async function Page(){const s=await settings();return <section className="section prose"><h1>Let’s talk.</h1><p>Questions about a piece, your delivery, or an order? We’re here to help.</p>{s.support_email&&<p><a href={`mailto:${s.support_email}`}>{s.support_email}</a></p>}{s.support_phone&&<p>{s.support_phone}</p>}{s.store_address&&<p>{s.store_address}</p>}{!s.support_email&&!s.support_phone&&!s.store_address&&<p>Contact details will be available here when the store opens.</p>}</section>;}
